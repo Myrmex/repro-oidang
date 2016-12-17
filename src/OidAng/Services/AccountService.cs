@@ -2,6 +2,7 @@
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using OidAng.Models;
 
@@ -11,11 +12,11 @@ namespace OidAng.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly RoleManager<ApplicationRole> _roleManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
         public AccountService(ApplicationDbContext context,
             UserManager<ApplicationUser> userManager,
-            RoleManager<ApplicationRole> roleManager)
+            RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _context = context;
@@ -23,7 +24,7 @@ namespace OidAng.Services
         }
 
         public async Task<IActionResult> Register(ApplicationUser user, string password,
-            IEnumerable<ApplicationRole> roles)
+            IEnumerable<IdentityRole> roles)
         {
             if (await _userManager.FindByEmailAsync(user.Email) != null)
                 return new BadRequestObjectResult($"User {user.Email} already exists.");

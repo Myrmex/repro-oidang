@@ -38,19 +38,23 @@ The sample for this flow in OpenIdDict is located at https://github.com/openiddi
 2.add these packages to the project's dependencies:
 
 ```json
-"Microsoft.Extensions.Configuration.CommandLine": "1.0.0",
-"Microsoft.AspNetCore.Identity.EntityFrameworkCore": "1.0.0",
-"Microsoft.EntityFrameworkCore.InMemory": "1.0.0",
-"Microsoft.EntityFrameworkCore.SqlServer": "1.0.1",
-"Microsoft.Extensions.Configuration.UserSecrets": "1.0.0",
-"OpenIddict": "1.0.0-*",
+```
+
+```json
 "AspNet.Security.OAuth.Validation": "1.0.0-alpha2-final",
-"Microsoft.AspNetCore.Authentication.Cookies": "1.0.0",
-"Microsoft.AspNetCore.Authentication.JwtBearer": "1.0.0",
-"Microsoft.AspNetCore.StaticFiles": "1.0.0",
-"Swashbuckle": "6.0.0-beta902",
-"MailKit": "1.8.1",
+"MailKit": "1.10.1",
+"Microsoft.AspNetCore.Authentication.Cookies": "1.1.0",
+"Microsoft.AspNetCore.Authentication.JwtBearer": "1.1.0",
+"Microsoft.AspNetCore.Identity.EntityFrameworkCore": "1.1.0",
+"Microsoft.AspNetCore.StaticFiles": "1.1.0",
+"Microsoft.EntityFrameworkCore.InMemory": "1.1.0",
+"Microsoft.EntityFrameworkCore.SqlServer": "1.1.0",
+"Microsoft.Extensions.Configuration.CommandLine": "1.1.0",
+"Microsoft.Extensions.Configuration.UserSecrets": "1.1.0",
 "NLog.Extensions.Logging": "1.0.0-*"
+"OpenIddict": "1.0.0-*",
+"OpenIddict.EntityFrameworkCore": "1.0.0-beta2-0516"
+"Swashbuckle": "6.0.0-beta902",
 ```
 
 MailKit is used for mailing, Swashbuckle for Swagger, NLog for file-based logging.
@@ -81,7 +85,7 @@ public static void Main(string[] args)
 }
 ```
 
-4.under `Models`, add identity models (`ApplicationUser`, `ApplicationRole`, `ApplicationDbContext`).
+4.under `Models`, add identity models (`ApplicationUser`, `ApplicationDbContext`).
 
 5.under `Services`, add `DatabaseInitializer` and `AccountService.cs`.
 
@@ -100,28 +104,28 @@ builder.AddEnvironmentVariables();
 in **ConfigureServices**, add (*before* `AddMvc`):
 
 ```c#
-// setup options with DI
-services.AddOptions();
-
-// CORS
-services.AddCors();
-
 // add entity framework and its context(s) using in memory (or config connection string)
 services.AddEntityFrameworkSqlServer()
     .AddDbContext<ApplicationDbContext>(options =>
-            options.UseInMemoryDatabase());
-            // options.UseSqlServer(Configuration.GetConnectionString("Authentication")));
+    {
+        // options.UseSqlServer(Configuration.GetConnectionString("Authentication")));
+        options.UseInMemoryDatabase();
+        options.UseOpenIddict();
+    });
 
 // add identity
-services.AddIdentity<ApplicationUser, ApplicationRole>()
+services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
 // add OpenIddict
-services.AddOpenIddict<ApplicationDbContext>()
+services.AddOpenIddict()
+    // Register the Entity Framework stores.
+    .AddEntityFrameworkCoreStores<ApplicationDbContext>()
     .DisableHttpsRequirement()
     .EnableTokenEndpoint("/connect/token")
     .EnableLogoutEndpoint("/connect/logout")
+    // http://openid.net/specs/openid-connect-core-1_0.html#UserInfo
     .EnableUserinfoEndpoint("/connect/userinfo")
     .AllowPasswordFlow()
     .AllowRefreshTokenFlow()
@@ -259,3 +263,4 @@ as a root property, also add:
 
 To secure your API, add an `[Authorize]` or `[Authorize(Roles = "some roles here")]` attribute to your controller or controller's method.
 
+*Last updated: 17 dec 2016**

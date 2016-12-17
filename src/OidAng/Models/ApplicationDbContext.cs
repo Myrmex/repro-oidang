@@ -1,12 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
-using OpenIddict;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace OidAng.Models
 {
-    public class ApplicationDbContext : OpenIddictDbContext<ApplicationUser, ApplicationRole>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-        {
-        }
+        public ApplicationDbContext(DbContextOptions options)
+            : base(options) { }
     }
 }

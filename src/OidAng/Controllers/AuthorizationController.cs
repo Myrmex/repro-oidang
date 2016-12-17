@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AspNet.Security.OpenIdConnect.Extensions;
+using AspNet.Security.OpenIdConnect.Primitives;
 using AspNet.Security.OpenIdConnect.Server;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -11,6 +12,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OidAng.Models;
 using OpenIddict;
+using OpenIddict.Core;
+using OpenIddict.Models;
 
 // https://github.com/openiddict/openiddict-samples/blob/master/samples/PasswordFlow/AuthorizationServer/Controllers/AuthorizationController.cs
 

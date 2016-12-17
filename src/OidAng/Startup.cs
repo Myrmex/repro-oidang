@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.EntityFrameworkCore;
 using NLog.Extensions.Logging;
 using OidAng.Models;
 using OidAng.Services;
@@ -42,16 +43,21 @@ namespace OidAng
             // add entity framework and its context(s) using in memory (or config connection string)
             services.AddEntityFrameworkSqlServer()
                 .AddDbContext<ApplicationDbContext>(options =>
-                        options.UseInMemoryDatabase());
-                        // options.UseSqlServer(Configuration.GetConnectionString("Authentication")));
+                {
+                    // options.UseSqlServer(Configuration.GetConnectionString("Authentication")));
+                    options.UseInMemoryDatabase();
+                    options.UseOpenIddict();
+                });
 
             // add identity
-            services.AddIdentity<ApplicationUser, ApplicationRole>()
+            services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
             // add OpenIddict
-            services.AddOpenIddict<ApplicationDbContext>()
+            services.AddOpenIddict()
+                // Register the Entity Framework stores.
+                .AddEntityFrameworkCoreStores<ApplicationDbContext>()
                 .DisableHttpsRequirement()
                 .EnableTokenEndpoint("/connect/token")
                 .EnableLogoutEndpoint("/connect/logout")
