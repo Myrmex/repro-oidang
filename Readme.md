@@ -53,7 +53,7 @@ The sample for this flow in OpenIdDict is located at https://github.com/openiddi
 "Microsoft.Extensions.Configuration.UserSecrets": "1.1.0",
 "NLog.Extensions.Logging": "1.0.0-*"
 "OpenIddict": "1.0.0-*",
-"OpenIddict.EntityFrameworkCore": "1.0.0-beta2-0516"
+"OpenIddict.EntityFrameworkCore": "1.0.0-*"
 "Swashbuckle": "6.0.0-beta902",
 ```
 
@@ -178,6 +178,8 @@ app.UseOAuthValidation();
 
 app.UseOpenIddict();
 ```
+
+Note: if deploying to Azure, ensure to CORS-enable your web app in the portal too.
 
 - add *after* `UseMvc()`:
 

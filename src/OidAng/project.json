@@ -4,6 +4,7 @@
   "dependencies": {
     "Swashbuckle": "6.0.0-beta902",
     "OpenIddict": "1.0.0-*",
+    "OpenIddict.EntityFrameworkCore": "1.0.0-*",
     "AspNet.Security.OAuth.Validation": "1.0.0-alpha2-final",
     "NLog.Extensions.Logging": "1.0.0-*",
     "MailKit": "1.10.1",
@@ -26,8 +27,7 @@
     "Microsoft.Extensions.Logging.Console": "1.1.0",
     "Microsoft.Extensions.Logging.Debug": "1.1.0",
     "Microsoft.Extensions.Options.ConfigurationExtensions": "1.1.0",
-    "Microsoft.NETCore.App": "1.1.0",
-    "OpenIddict.EntityFrameworkCore": "1.0.0-beta2-0516"
+    "Microsoft.NETCore.App": "1.1.0"
   },
 
   "tools": {
