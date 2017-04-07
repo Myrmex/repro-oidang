@@ -14,6 +14,8 @@ namespace OidAng
 {
     public class Startup
     {
+        public IConfigurationRoot Configuration { get; }
+
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -23,13 +25,12 @@ namespace OidAng
                 .AddEnvironmentVariables();
 
             // allow overriding configuration values from user secrets/environment
-            if (env.IsDevelopment()) builder.AddUserSecrets();
+            if (env.IsDevelopment())
+                builder.AddUserSecrets("aspnet-oidang-04bb693a-d29e-4986-8721-351b6f7d5627");
             builder.AddEnvironmentVariables();
 
             Configuration = builder.Build();
         }
-
-        public IConfigurationRoot Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -38,19 +39,23 @@ namespace OidAng
             // https://docs.asp.net/en/latest/fundamentals/configuration.html
             services.AddOptions();
 
-            // CORS
+            // CORS (note: if using Azure, remember to enable CORS in the portal, too!)
             services.AddCors();
 
-            // add entity framework and its context(s) using in memory (or config connection string)
+            // add entity framework and its context(s) using in-memory 
+            // (or use the commented line to use a connection string to a real DB)
             services.AddEntityFrameworkSqlServer()
                 .AddDbContext<ApplicationDbContext>(options =>
                 {
                     // options.UseSqlServer(Configuration.GetConnectionString("Authentication")));
                     options.UseInMemoryDatabase();
+                    // register the entity sets needed by OpenIddict.
+                    // Note: use the generic overload if you need
+                    // to replace the default OpenIddict entities.
                     options.UseOpenIddict();
                 });
 
-            // add identity
+            // register the Identity services
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
@@ -65,50 +70,37 @@ namespace OidAng
                 options.ClaimsIdentity.RoleClaimType = OpenIdConnectConstants.Claims.Role;
             });
 
-            // add OpenIddict
-/*            services.AddOpenIddict()
-                // Register the Entity Framework stores.
-                .AddEntityFrameworkCoreStores<ApplicationDbContext>()
-                .DisableHttpsRequirement()
-                .EnableTokenEndpoint("/connect/token")
-                .EnableLogoutEndpoint("/connect/logout")
-                // http://openid.net/specs/openid-connect-core-1_0.html#UserInfo
-                .EnableUserinfoEndpoint("/connect/userinfo")
-                .AllowPasswordFlow()
-                .AllowRefreshTokenFlow()
-                .AddEphemeralSigningKey();
-*/
+            // register the OpenIddict services
             services.AddOpenIddict(options =>
             {
-                // Register the Entity Framework stores.
+                // register the Entity Framework stores
                 options.AddEntityFrameworkCoreStores<ApplicationDbContext>();
 
-                // Register the ASP.NET Core MVC binder used by OpenIddict.
+                // register the ASP.NET Core MVC binder used by OpenIddict.
                 // Note: if you don't call this method, you won't be able to
-                // bind OpenIdConnectRequest or OpenIdConnectResponse parameters.
-                // options.AddMvcBinders();
+                // bind OpenIdConnectRequest or OpenIdConnectResponse parameters
+                // to action methods. Alternatively, you can still use the lower-level
+                // HttpContext.GetOpenIdConnectRequest() API.
+                options.AddMvcBinders();
 
-                // Enable the token endpoint.
+                // enable the endpoints
                 options.EnableTokenEndpoint("/connect/token");
                 options.EnableLogoutEndpoint("/connect/logout");
                 // http://openid.net/specs/openid-connect-core-1_0.html#UserInfo
                 options.EnableUserinfoEndpoint("/connect/userinfo");
 
-                // Enable the password flow.
+                // enable the password flow
                 options.AllowPasswordFlow();
                 options.AllowRefreshTokenFlow();
-                options.AddEphemeralSigningKey();
 
-                // During development, you can disable the HTTPS requirement.
+                // during development, you can disable the HTTPS requirement
                 options.DisableHttpsRequirement();
 
                 // Note: to use JWT access tokens instead of the default
                 // encrypted format, the following lines are required:
-                //
                 // options.UseJsonWebTokens();
                 // options.AddEphemeralSigningKey();
             });
-///////////////
 
             // add framework services
             services.AddMvc()
@@ -133,6 +125,9 @@ namespace OidAng
             loggerFactory.AddDebug();
             loggerFactory.AddNLog();
 
+            // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/error-handling
+            if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
+
             // to serve up index.html
             app.UseDefaultFiles();
             app.UseStaticFiles();
@@ -144,12 +139,15 @@ namespace OidAng
                         .AllowAnyHeader()
                         .AllowAnyMethod());
 
-            // Add a middleware used to validate access tokens and protect the API endpoints.
+            // add a middleware used to validate access tokens and protect the API endpoints
             app.UseOAuthValidation();
 
             app.UseOpenIddict();
 
             app.UseMvc();
+
+            // app.UseMvcWithDefaultRoute();
+            // app.UseWelcomePage();
 
             // seed the database
             databaseInitializer.Seed().GetAwaiter().GetResult();

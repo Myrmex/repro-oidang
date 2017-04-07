@@ -63,14 +63,11 @@ namespace OidAng.Controllers
             // Note: by default, claims are NOT automatically included in the access and identity tokens.
             // To allow OpenIddict to serialize them, you must attach them a destination, that specifies
             // whether they should be included in access tokens, in identity tokens or in both.
-
             foreach (var claim in ticket.Principal.Claims)
             {
                 // Never include the security stamp in the access and identity tokens, as it's a secret value.
                 if (claim.Type == _identityOptions.Value.ClaimsIdentity.SecurityStampClaimType)
-                {
                     continue;
-                }
 
                 List<string> destinations = new List<string>
                 {
@@ -96,9 +93,10 @@ namespace OidAng.Controllers
         }
 
         [HttpPost("~/connect/token"), Produces("application/json")]
-        public async Task<IActionResult> Exchange()
+        public async Task<IActionResult> Exchange(OpenIdConnectRequest request)
         {
-            OpenIdConnectRequest request = HttpContext.GetOpenIdConnectRequest();
+            // if you prefer not to bind the request as a parameter, you can still use:
+            // OpenIdConnectRequest request = HttpContext.GetOpenIdConnectRequest();
 
             Debug.Assert(request.IsTokenRequest(),
                 "The OpenIddict binder for ASP.NET Core MVC is not registered. " +

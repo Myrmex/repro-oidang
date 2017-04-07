@@ -42,6 +42,7 @@ AspNet.Security.OAuth.Validation
 MailKit
 Microsoft.AspNetCore.Authentication.Cookies
 Microsoft.AspNetCore.Authentication.JwtBearer
+Microsoft.AspNetCore.Diagnostics
 Microsoft.AspNetCore.Identity.EntityFrameworkCore
 Microsoft.AspNetCore.Mvc
 Microsoft.AspNetCore.Routing
@@ -63,6 +64,7 @@ Microsoft.NETCore.App
 NLog.Extensions.Logging
 OpenIddict
 OpenIddict.EntityFrameworkCore
+OpenIddict.Mvc
 Swashbuckle
 ```
 
