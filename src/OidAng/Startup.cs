@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using AspNet.Security.OpenIdConnect.Primitives;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -54,8 +55,18 @@ namespace OidAng
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
+            // configure Identity to use the same JWT claims as OpenIddict instead
+            // of the legacy WS-Federation claims it uses by default (ClaimTypes),
+            // which saves you from doing the mapping in your authorization controller.
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.ClaimsIdentity.UserNameClaimType = OpenIdConnectConstants.Claims.Name;
+                options.ClaimsIdentity.UserIdClaimType = OpenIdConnectConstants.Claims.Subject;
+                options.ClaimsIdentity.RoleClaimType = OpenIdConnectConstants.Claims.Role;
+            });
+
             // add OpenIddict
-            services.AddOpenIddict()
+/*            services.AddOpenIddict()
                 // Register the Entity Framework stores.
                 .AddEntityFrameworkCoreStores<ApplicationDbContext>()
                 .DisableHttpsRequirement()
@@ -66,6 +77,38 @@ namespace OidAng
                 .AllowPasswordFlow()
                 .AllowRefreshTokenFlow()
                 .AddEphemeralSigningKey();
+*/
+            services.AddOpenIddict(options =>
+            {
+                // Register the Entity Framework stores.
+                options.AddEntityFrameworkCoreStores<ApplicationDbContext>();
+
+                // Register the ASP.NET Core MVC binder used by OpenIddict.
+                // Note: if you don't call this method, you won't be able to
+                // bind OpenIdConnectRequest or OpenIdConnectResponse parameters.
+                // options.AddMvcBinders();
+
+                // Enable the token endpoint.
+                options.EnableTokenEndpoint("/connect/token");
+                options.EnableLogoutEndpoint("/connect/logout");
+                // http://openid.net/specs/openid-connect-core-1_0.html#UserInfo
+                options.EnableUserinfoEndpoint("/connect/userinfo");
+
+                // Enable the password flow.
+                options.AllowPasswordFlow();
+                options.AllowRefreshTokenFlow();
+                options.AddEphemeralSigningKey();
+
+                // During development, you can disable the HTTPS requirement.
+                options.DisableHttpsRequirement();
+
+                // Note: to use JWT access tokens instead of the default
+                // encrypted format, the following lines are required:
+                //
+                // options.UseJsonWebTokens();
+                // options.AddEphemeralSigningKey();
+            });
+///////////////
 
             // add framework services
             services.AddMvc()
@@ -110,9 +153,6 @@ namespace OidAng
 
             // seed the database
             databaseInitializer.Seed().GetAwaiter().GetResult();
-
-            //needed for non-NETSTANDARD platforms: configure nlog.config in your project root
-            env.ConfigureNLog("nlog.config");
 
             // swagger
             // enable middleware to serve generated Swagger as a JSON endpoint

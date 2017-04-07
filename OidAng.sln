@@ -1,17 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{6E2E0485-C810-43DE-820E-94DA946CE5FB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3598A8B6-D029-43AF-9EA1-5D107F7816D3}"
 	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
 		Readme.md = Readme.md
 	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "OidAng", "src\OidAng\OidAng.xproj", "{702AD790-897A-4B2A-87AE-BC7176128A47}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OidAng", "src\OidAng\OidAng.csproj", "{702AD790-897A-4B2A-87AE-BC7176128A47}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -35,31 +35,40 @@ The sample for this flow in OpenIdDict is located at https://github.com/openiddi
 </configuration>
 ```
 
-2.add these packages to the project's dependencies:
+3.ensure that you have these packages in the project (you can list them using a NuGet command like `get-package | Format-Table -AutoSize` in the NuGet console):
 
-```json
 ```
-
-```json
-"AspNet.Security.OAuth.Validation": "1.0.0-alpha2-final",
-"MailKit": "1.10.1",
-"Microsoft.AspNetCore.Authentication.Cookies": "1.1.0",
-"Microsoft.AspNetCore.Authentication.JwtBearer": "1.1.0",
-"Microsoft.AspNetCore.Identity.EntityFrameworkCore": "1.1.0",
-"Microsoft.AspNetCore.StaticFiles": "1.1.0",
-"Microsoft.EntityFrameworkCore.InMemory": "1.1.0",
-"Microsoft.EntityFrameworkCore.SqlServer": "1.1.0",
-"Microsoft.Extensions.Configuration.CommandLine": "1.1.0",
-"Microsoft.Extensions.Configuration.UserSecrets": "1.1.0",
-"NLog.Extensions.Logging": "1.0.0-*"
-"OpenIddict": "1.0.0-*",
-"OpenIddict.EntityFrameworkCore": "1.0.0-*"
-"Swashbuckle": "6.0.0-beta902",
+AspNet.Security.OAuth.Validation
+MailKit
+Microsoft.AspNetCore.Authentication.Cookies
+Microsoft.AspNetCore.Authentication.JwtBearer
+Microsoft.AspNetCore.Identity.EntityFrameworkCore
+Microsoft.AspNetCore.Mvc
+Microsoft.AspNetCore.Routing
+Microsoft.AspNetCore.Server.IISIntegration
+Microsoft.AspNetCore.Server.Kestrel
+Microsoft.AspNetCore.StaticFiles
+Microsoft.EntityFrameworkCore.InMemory
+Microsoft.EntityFrameworkCore.SqlServer
+Microsoft.Extensions.Configuration.CommandLine
+Microsoft.Extensions.Configuration.EnvironmentVariables
+Microsoft.Extensions.Configuration.FileExtensions
+Microsoft.Extensions.Configuration.Json
+Microsoft.Extensions.Configuration.UserSecrets
+Microsoft.Extensions.Logging
+Microsoft.Extensions.Logging.Console
+Microsoft.Extensions.Logging.Debug
+Microsoft.Extensions.Options.ConfigurationExtensions
+Microsoft.NETCore.App
+NLog.Extensions.Logging
+OpenIddict
+OpenIddict.EntityFrameworkCore
+Swashbuckle
 ```
 
 MailKit is used for mailing, Swashbuckle for Swagger, NLog for file-based logging.
 
-3.in `Program.cs`, you can configure logging:
+4.in `Program.cs`, you can configure logging:
 
 ```c#
 // ...
@@ -85,15 +94,15 @@ public static void Main(string[] args)
 }
 ```
 
-4.under `Models`, add identity models (`ApplicationUser`, `ApplicationDbContext`).
+5.under `Models`, add identity models (`ApplicationUser`, `ApplicationDbContext`).
 
-5.under `Services`, add `DatabaseInitializer` and `AccountService.cs`.
+6.under `Services`, add `DatabaseInitializer` and `AccountService.cs`.
 
-6.eventually, add your database connection string to `appsettings.json`. You will then override it using an environment variable source (or a production-targeted version of appsettings) for production. 
+7.eventually, add your database connection string to `appsettings.json`. You will then override it using an environment variable source (or a production-targeted version of appsettings) for production. 
 
 Alternatively, just use an in-memory database (see below).
 
-7.`Startup.cs/ConfigureServices`: in **constructor**, add these lines to allow overriding configuration values from user secrets or environment variables:
+8.`Startup.cs/ConfigureServices`: in **constructor**, add these lines to allow overriding configuration values from user secrets or environment variables:
 
 ```c#
 // allow overriding configuration values from user secrets/environment
@@ -199,7 +208,7 @@ app.UseSwaggerUi();
 
 Note that if you want to add tables to an existing database the seed does not seem to work.
 
-8.for NLog, add file `nlog.config` to your project's root. Here is a sample:
+9.for NLog, add file `nlog.config` to your project's root. Here is a sample:
 
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
@@ -233,23 +242,12 @@ Note that if you want to add tables to an existing database the seed does not se
 </nlog>
 ```
 
-9.under `Controllers`, add `AuthorizationController.cs`.
+10.under `Controllers`, add `AuthorizationController.cs`.
 
-10.in `project.json`:
+11.in the `csproj` file add your user secrets ID if you are going to use the secrets manager, e.g.:
 
-- for secrets manager, if you use it: under `tools`, add:
-
-```json
-    "Microsoft.Extensions.SecretManager": {
-      "version": "1.0.0-rc1-final",
-      "imports": "dnx451"
-    }
-```
-
-as a root property, also add:
-
-```json
-"userSecretsId": "aspnet-oidang-04bb693a-d29e-4986-8721-351b6f7d5627",
+```xml
+<UserSecretsId>aspnet-oidang-04bb693a-d29e-4986-8721-351b6f7d5627</UserSecretsId>
 ```
 
 (change the GUID with another one, e.g. from https://www.guidgen.com/, or use any other unique ID for your app).
@@ -265,4 +263,4 @@ as a root property, also add:
 
 To secure your API, add an `[Authorize]` or `[Authorize(Roles = "some roles here")]` attribute to your controller or controller's method.
 
-*Last updated: 17 dec 2016**
+**Last updated: apr 7, 2017**
