@@ -265,4 +265,4 @@ Note that if you want to add tables to an existing database the seed does not se
 
 To secure your API, add an `[Authorize]` or `[Authorize(Roles = "some roles here")]` attribute to your controller or controller's method.
 
-**Last updated: apr 7, 2017**
+**Last updated: May 31, 2017**
